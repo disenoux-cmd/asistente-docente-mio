@@ -1,164 +1,211 @@
-# Guia de despliegue en Netlify para docentes
+# Guia para docentes: publica tu asistente virtual
 
-Esta guia esta pensada para docentes que no usan GitHub y quieren publicar el asistente arrastrando un archivo `.zip` al panel de Netlify. No requiere instalar Node.js ni usar la terminal.
+Esta guia explica como desplegar tu propio asistente virtual de curso en Netlify. No necesitas saber programar, usar la terminal ni instalar nada. Solo necesitas una cuenta de correo y 15-20 minutos.
 
-## 1. Que necesita el docente
+## Antes de empezar
 
-Antes de comenzar, el docente debe tener:
+Vas a necesitar:
 
-1. Una cuenta en Netlify (gratis en https://app.netlify.com).
-2. Una API key de Kimi (Moonshot).
-3. Un codigo de acceso para proteger `config.html`.
-4. El archivo `.zip` del proyecto.
+1. Un navegador web (Chrome, Firefox, Edge, Safari).
+2. Una cuenta de correo electronico (Gmail, Outlook, Yahoo, etc.).
+3. Una API key de Kimi (Moonshot). La obtienes en https://platform.moonshot.ai. Es gratis para empezar.
 
-## 2. Configuracion inicial recomendada
+El flujo usa dos servicios:
 
-La plantilla queda preparada inicialmente con:
+- **GitHub**: donde se guarda una copia personal del proyecto (necesario para que puedas personalizarla).
+- **Netlify**: donde se publica el asistente para que este accesible desde internet.
 
-1. Proveedor: `Kimi`
-2. Modelo: `kimi-k2.5`
+---
 
-## 3. Personalizar el asistente antes de publicar
+## Paso 1: Crear cuenta en GitHub
 
-1. Descomprime el `.zip` en una carpeta de tu equipo.
-2. Abre el archivo `config.html` con el navegador.
-3. Ingresa el codigo de acceso definido para tu entorno de prueba.
-4. Completa los campos:
-   - nombre del curso,
-   - nombre del docente,
-   - color institucional,
-   - prompt principal,
-   - bloque unico de informacion del curso.
-5. Verifica que el proveedor sea `Kimi 2.5`.
-6. Descarga la configuracion con el boton correspondiente.
-7. Reemplaza el archivo `course-data.json` de la carpeta descomprimida por el archivo descargado.
+1. Abre https://github.com/signup
+2. Ingresa tu correo electronico. **Usa el mismo correo que usaras en Netlify** (Paso 2).
+3. Crea una contrasena segura.
+4. Elige un nombre de usuario (sera visible en la URL de tu repositorio, por ejemplo `https://github.com/maria-docente/asistente-docente`).
+5. Resuelve el captcha y verifica tu correo con el codigo que GitHub te envia.
 
-## 4. Crear el archivo .zip para Netlify
+## Paso 2: Crear cuenta en Netlify
 
-Una vez terminada la configuracion:
+1. Abre https://app.netlify.com/signup
+2. Click en **Sign up** y elige la opcion que prefieras (Google, GitHub, o email).
+3. **Si te registraste con Google**, el correo debe coincidir con el de GitHub.
+4. **Si te registraste con email**, asegurate de usar el mismo correo que en GitHub.
 
-1. Abre la carpeta del proyecto.
-2. Selecciona **todos los archivos y carpetas que estan dentro** (no la carpeta padre).
-3. Comprimelos en un archivo `.zip` (clic derecho > "Comprimir" o "Enviar a > Carpeta comprimida").
+## Paso 3: Hacer una copia personal del proyecto (fork)
 
-Importante:
+Un "fork" es una copia del proyecto en tu propia cuenta de GitHub. Asi puedes personalizarla sin afectar el original.
 
-1. El `.zip` debe contener los archivos del proyecto directamente en la raiz.
-2. No debe haber una carpeta adicional envolviendo todo.
+1. Abre https://github.com/osber00/asistente-docente
+2. Arriba a la derecha, click en el boton **Fork**.
+3. Si te pide elegir donde hacer el fork, dejalo en tu cuenta personal.
+4. Espera unos segundos. GitHub te llevara a tu copia, con una URL como:
+   ```
+   https://github.com/TU-USUARIO/asistente-docente
+   ```
+   A partir de ahora, **TU-USUARIO** es tu nombre de usuario de GitHub.
 
-Dentro del `.zip` deben verse directamente archivos como:
+## Paso 4: Editar el boton del README para que apunte a TU copia
 
-```text
-index.html
-config.html
-course-data.json
-netlify.toml
-build.js
-netlify/
-```
+El boton "Deploy to Netlify" del README apunta al repositorio original. Necesitamos cambiarlo para que use tu fork.
 
-## 5. Publicar el sitio arrastrando el .zip a Netlify
+1. En tu fork, click en el archivo `README.md`.
+2. Click en el icono de lapiz (✏️) arriba a la derecha.
+3. Busca esta linea dentro del link del boton:
+   ```
+   https://github.com/osber00/asistente-docente
+   ```
+   y cambiala por:
+   ```
+   https://github.com/TU-USUARIO/asistente-docente
+   ```
+4. Scroll abajo, click **Commit changes**.
+5. Vuelve a la pagina principal del repositorio (click en el nombre del repo arriba a la izquierda).
 
-1. Inicia sesion en https://app.netlify.com.
-2. En el panel principal, click en **Add new site**.
-3. Elige **Deploy manually**.
-4. Arrastra el archivo `.zip` a la zona de carga.
+## Paso 5: Personalizar el contenido del curso (opcional pero recomendado)
 
-Netlify subira el sitio y ejecutara un build automatico. Veras en el log pasos como `Initializing`, `Building`, `Deploying`, `Post-processing` (todos en verde). El paso `Building` debe terminar mostrando un mensaje similar a `[build] netlify/functions/course-data.js generado`.
+Por defecto, el asistente viene con un curso de ejemplo. Para configurar el tuyo tienes dos opciones:
 
-5. Cuando el deploy termine, Netlify te mostrara la URL del sitio, con un formato como `https://nombre-aleatorio.netlify.app`. Abrela para confirmar que ves el chat.
+### Opcion A: Editar `course-data.json` directamente en GitHub
 
-## 6. Configurar las variables de entorno
+1. En tu fork, click en el archivo `course-data.json`.
+2. Click en el icono de lapiz (✏️).
+3. Edita los valores entre comillas. Por ejemplo:
+   - `"courseName"`: nombre de tu curso
+   - `"teacherName"`: tu nombre
+   - `"mainPrompt"`: instrucciones para el asistente
+   - `"courseInfo"`: el bloque de informacion del curso
+4. **Cuidado**: respeta las comillas, comas y llaves. Si te equivocas, GitHub te mostrara un error.
+5. Scroll abajo, click **Commit changes**.
 
-El sitio ya esta publicado, pero el chat aun no responde porque faltan las claves. Configuralas asi:
+### Opcion B: Usar el formulario visual `config.html`
 
-1. En el panel de Netlify, abre tu sitio.
-2. Ve a **Site configuration** > **Environment variables**.
-3. Click en **Add a variable** y agrega la primera:
-
-   | Key | Scope | Valor en Production |
-   |-----|-------|---------------------|
-   | `MOONSHOT_API_KEY` | Builds, Functions, Runtime | tu API key de Kimi |
-   | `CONFIG_ACCESS_CODE` | Builds, Functions, Runtime | tu codigo de acceso |
-
-   Para cada variable:
-   - Escribe el nombre (Key).
-   - En la seccion **Scopes**, marca **Builds**, **Functions** y **Runtime**.
-   - En la seccion **Values**, click **Add value**, elige **Production** y pega el valor.
-   - Guarda.
-
-## 7. Redesplegar para activar las variables
-
-Las variables de entorno solo se aplican a las funciones despues de un nuevo deploy:
-
-1. En tu sitio, ve a **Deploys**.
-2. Arrastra otra vez el mismo `.zip` a la zona de carga.
-
-Esto fuerza un nuevo deploy que ya tendra acceso a las variables. Espera a que termine (un par de minutos).
-
-## 8. Probar el sitio publicado
-
-Prueba al menos estas rutas:
-
-1. Sitio principal: `https://tu-sitio.netlify.app`
-2. Configuracion: `https://tu-sitio.netlify.app/config.html`
-
-Pruebas recomendadas en el chat:
-
-1. `¿Hay foros?`
-2. `¿Cuantas unidades tiene el curso?`
-3. `¿Que lecturas recomendadas hay?`
-4. `¿Como se evalua el curso?`
-
-Si todas responden coherentemente, el despliegue esta completo.
-
-## 9. Probar seguridad de configuracion
-
-En `config.html`:
+Una vez que el sitio este desplegado (Paso 6 en adelante), puedes:
 
 1. Abre `https://tu-sitio.netlify.app/config.html`.
-2. Prueba con el codigo correcto (el mismo que pusiste en `CONFIG_ACCESS_CODE`).
-3. Prueba con un codigo incorrecto.
+2. Ingresa tu `CONFIG_ACCESS_CODE`.
+3. Llena el formulario visualmente.
+4. Click en **Descargar configuracion**.
+5. Vuelve a GitHub, abre `course-data.json` con el lapiz, **borra todo el contenido**, pega el del archivo descargado, y commitea.
 
-Resultado esperado:
+## Paso 6: Desplegar el asistente en Netlify
 
-1. Con codigo correcto, se abre el formulario de configuracion.
-2. Con codigo incorrecto, se rechaza el acceso.
+Ahora viene la publicacion.
 
-## 10. Si el docente quiere actualizar el asistente luego
+1. En tu fork, scroll hasta el README y busca el boton **Deploy to Netlify**.
+2. Click en el boton. Se abrira una nueva pestana con el wizard de Netlify.
+3. Si te pide conectar a GitHub, autoriza a Netlify.
+4. Netlify detectara tu repositorio y te mostrara la configuracion. **No cambies nada**, solo verifica que diga tu fork.
+5. Click **Deploy site**.
+6. Espera 1-2 minutos. Veras una pantalla de progreso con los pasos del build.
+7. Al terminar, Netlify te muestra la URL de tu sitio, algo como:
+   ```
+   https://random-name-12345.netlify.app
+   ```
 
-1. Descomprime de nuevo el `.zip` en una carpeta de trabajo.
-2. Abre `config.html`, edita lo que necesites, descarga la nueva configuracion.
-3. Reemplaza `course-data.json` en la carpeta con el archivo descargado.
-4. Crea un nuevo `.zip` siguiendo el paso 4.
-5. En Netlify, ve a **Deploys** y arrastra el nuevo `.zip** (sobre el mismo sitio).
-6. Netlify redespliega. Las variables de entorno se conservan, no hay que volver a configurarlas.
+## Paso 7: Configurar las variables de entorno
 
-## 11. Variables necesarias
+Las variables de entorno son las claves secretas que necesita el asistente para funcionar.
 
-En `Site configuration > Environment variables` deben existir:
+1. En el dashboard de Netlify, abre tu sitio.
+2. Ve a **Site configuration** > **Environment variables**.
+3. Click **Add a variable** y agrega la primera:
+
+   | Campo | Valor |
+   |-------|-------|
+   | Key | `MOONSHOT_API_KEY` |
+   | Scopes | marca **Builds**, **Functions** y **Runtime** |
+   | Values | click **Add value** > contexto **Production** > pega tu API key de Kimi |
+
+4. Click **Add a variable** y agrega la segunda:
+
+   | Campo | Valor |
+   |-------|-------|
+   | Key | `CONFIG_ACCESS_CODE` |
+   | Scopes | marca **Builds**, **Functions** y **Runtime** |
+   | Values | contexto **Production** > escribe el codigo que quieras usar (ej. `MiClave2026!`) |
+
+## Paso 8: Redesplegar para activar las variables
+
+Las variables no se aplican hasta hacer un nuevo deploy:
+
+1. En el menu lateral, ve a **Deploys**.
+2. Arriba a la derecha, click **Trigger deploy**.
+3. Elige **Clear cache and deploy site**.
+4. Espera 1-2 minutos.
+
+## Paso 9: Probar el sitio
+
+1. Abre `https://random-name-12345.netlify.app` (la URL de tu sitio).
+2. Escribe una pregunta en el chat, por ejemplo:
+   - `¿Cuantas unidades tiene el curso?`
+   - `¿Como se evalua?`
+3. Si el asistente responde coherentemente, **el despliegue esta completo**.
+4. Tambien prueba `https://random-name-12345.netlify.app/config.html` e ingresa tu `CONFIG_ACCESS_CODE`. Deberia abrir el formulario.
+
+## Paso 10 (opcional): Personalizar la URL
+
+Por defecto tu sitio tiene una URL aleatoria. Puedes cambiarla:
+
+1. **Site configuration** > **Site details**.
+2. Click **Change site name**.
+3. Elige un nombre (ej. `asistente-matematicas-2026`).
+4. Tu nueva URL sera `https://asistente-matematicas-2026.netlify.app`.
+
+---
+
+## Actualizaciones futuras
+
+### Cambiar el contenido del curso
+
+1. Edita `course-data.json` en tu fork de GitHub (o usa el formulario `config.html` y sube el archivo descargado).
+2. Haz commit.
+3. Netlify redespliega **automaticamente** (no tienes que hacer nada mas). Espera 1-2 minutos y la version nueva estara en tu URL.
+
+### Cambiar las variables de entorno
+
+1. **Site configuration** > **Environment variables**.
+2. Edita o agrega variables.
+3. **Deploys** > **Trigger deploy** > **Clear cache and deploy site**.
+
+---
+
+## Solucion de problemas
+
+### El chat dice "El servicio de chat no esta disponible"
+
+`MOONSHOT_API_KEY` no esta configurada o no se redesplego. Revisa los pasos 7 y 8.
+
+### El formulario de config rechaza el codigo correcto
+
+`CONFIG_ACCESS_CODE` no esta definida o no se redesplego. Mismos pasos.
+
+### El sitio dice "Page not found" al abrirlo
+
+El build fallo. Ve a **Deploys** > click en el ultimo deploy > revisa si hay pasos en rojo. Comparte el error con quien te dio la plantilla.
+
+### El boton "Deploy to Netlify" crea un sitio con la URL del repositorio equivocado
+
+Probablemente no actualizaste la URL en el README (Paso 4). Edita el README, corrige la URL, commit, y vuelve a hacer click en el boton.
+
+### Quiero conectar un dominio personalizado (ej. `asistente.micolegio.edu`)
+
+1. Compra o configura el dominio donde tu proveedor habitual.
+2. En Netlify: **Domain management** > **Add a domain**.
+3. Sigue las instrucciones para apuntar el DNS.
+
+---
+
+## Resumen rapido (para los que ya entienden)
 
 ```text
-MOONSHOT_API_KEY=tu_api_key_de_kimi
-CONFIG_ACCESS_CODE=tu_codigo_seguro
+1. Cuenta en github.com (mismo correo que Netlify)
+2. Cuenta en app.netlify.com
+3. Fork de github.com/osber00/asistente-docente
+4. Editar README.md: cambiar osber00 por tu usuario
+5. (Opcional) Editar course-data.json
+6. Click en "Deploy to Netlify" del README
+7. Site configuration > Environment variables: MOONSHOT_API_KEY y CONFIG_ACCESS_CODE
+8. Deploys > Trigger deploy > Clear cache and deploy site
+9. Probar la URL
 ```
-
-Ambas con scope **Builds, Functions, Runtime** y valor en **Production**.
-
-## 12. Resolucion de problemas frecuentes
-
-- **El chat dice "El servicio de chat no esta disponible"**: la funcion `/.netlify/functions/chat` no responde. Verifica que `MOONSHOT_API_KEY` esta configurada y que redesplegaste despues de agregarla.
-- **`config.html` dice codigo incorrecto aun con el codigo bien**: `CONFIG_ACCESS_CODE` no esta definida o no se redesplego. Arrastra el `.zip** otra vez a Deploys.
-- **El log muestra "Building: Failed"**: hay un error en el build. Expande el paso **Building** en el log para ver el detalle y compartelo con quien te dio la plantilla.
-- **El deploy dice "Page not found" al abrir el sitio**: el `.zip` no se extrajo con `index.html` y `netlify.toml` en la raiz. Revisa el paso 4.
-- **La pestaña Functions aparece vacia**: el deploy fallo. Revisa el log del deploy y asegurate de que el paso Building termino en Complete.
-
-## 13. Recomendacion final
-
-Antes de compartir el enlace con estudiantes:
-
-1. Verifica que el contenido del curso este bien redactado en `config.html`.
-2. Haz al menos 5 preguntas reales del curso en el chat publicado.
-3. Confirma que Kimi responde correctamente y que las FAQ se resuelven sin invocar al LLM.
-4. Confirma que `config.html` rechaza codigos incorrectos.
-5. Guarda una copia de la carpeta final y del `.zip` como respaldo.
