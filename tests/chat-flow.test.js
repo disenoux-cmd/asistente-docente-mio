@@ -26,7 +26,7 @@ test("construye un prompt con reglas y contexto del curso", () => {
   const match = findBestCourseMatch("Explica la metodologia del curso", sampleCourseData);
   const prompt = buildPrompt(sampleCourseData, "Explica la metodologia del curso", match);
 
-  assert.match(prompt.systemPrompt, /Didáctica Universitaria con IA/);
+  assert.match(prompt.systemPrompt, new RegExp(sampleCourseData.courseName));
   assert.match(prompt.systemPrompt, /Bloque oficial de informacion del curso/);
   assert.match(prompt.userPrompt, /metodologia/);
 });

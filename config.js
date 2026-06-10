@@ -244,7 +244,7 @@ async function verifyAccessCode(code) {
 }
 
 function updateProviderUI(provider, shouldForceModel = true) {
-  const normalizedProvider = PROVIDER_PRESETS[provider] ? provider : "gemini";
+  const normalizedProvider = PROVIDER_PRESETS[provider] ? provider : "kimi";
   const preset = PROVIDER_PRESETS[normalizedProvider];
   const providerInput = configForm.elements.provider;
 

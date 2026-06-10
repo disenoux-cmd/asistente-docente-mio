@@ -20,6 +20,12 @@ Plantilla base para crear y desplegar un asistente virtual de curso en Netlify u
 6. En Netlify, registra la variable de entorno del proveedor elegido.
 7. Publica el proyecto.
 
+## Despliegue para docentes
+
+Si el docente no usara GitHub y subira un `.zip` directamente a Netlify, revisa esta guia:
+
+1. `GUIA-DESPLIEGUE-NETLIFY.md`
+
 ## Variables de entorno
 
 Configura solo la que corresponda al proveedor elegido:
