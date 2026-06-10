@@ -1,9 +1,9 @@
 {
-  "courseName": "Vida Universitaria",
-  "teacherName": "María Flórez",
+  "courseName": "Asistentes con IA",
+  "teacherName": "Oscar Bertel P",
   "theme": {
-    "primaryColor": "#b9d539",
-    "accentColor": "#b9d539",
+    "primaryColor": "#f5804c",
+    "accentColor": "#f5804c",
     "surfaceColor": "#f8fafc"
   },
   "assistant": {
