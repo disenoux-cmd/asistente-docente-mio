@@ -13,7 +13,7 @@ Plantilla base para crear y desplegar un asistente virtual de curso en Netlify u
 ## Flujo de uso
 
 1. Abre `config.html`.
-2. Ingresa el codigo demo `docente2026`.
+2. Ingresa el codigo configurado en `CONFIG_ACCESS_CODE`.
 3. Edita curso, docente, colores, prompt, unidades, foros, lecturas y FAQ.
 4. Descarga el nuevo `course-data.json`.
 5. Reemplaza el archivo original en la raiz del proyecto.
@@ -28,6 +28,7 @@ Configura solo la que corresponda al proveedor elegido:
 OPENAI_API_KEY=
 GEMINI_API_KEY=
 MOONSHOT_API_KEY=
+CONFIG_ACCESS_CODE=
 ```
 
 ## Proveedores recomendados en esta plantilla
@@ -68,4 +69,4 @@ Para enviar mensajes con teclado:
 
 ## Nota sobre `config.html`
 
-La proteccion de `config.html` es deliberadamente basica y solo evita ediciones accidentales. No es autenticacion real. Si no quieres publicar esa ruta, elimina el archivo antes del despliegue o mantenlo solo en tu copia de trabajo.
+`config.html` valida el acceso contra `/.netlify/functions/verify-config-access` usando la variable de entorno `CONFIG_ACCESS_CODE`, para que el codigo no quede expuesto en el frontend.

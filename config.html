@@ -28,7 +28,7 @@
             <input id="access-code" name="access-code" type="password" placeholder="Ingresa el codigo de acceso">
             <button id="unlock-button" type="button">Ingresar</button>
           </div>
-          <p class="helper-text">Codigo demo inicial: <code>docente2026</code>. Cambialo antes de distribuir la plantilla.</p>
+          <p class="helper-text">Usa el codigo configurado en la variable de entorno <code>CONFIG_ACCESS_CODE</code> de Netlify.</p>
         </div>
 
         <form id="config-form" class="config-form hidden">
@@ -50,19 +50,50 @@
               </label>
 
               <label>
-                <span>Color principal</span>
-                <input name="primaryColor" type="color" required>
-              </label>
-
-              <label>
-                <span>Color de acento</span>
-                <input name="accentColor" type="color" required>
+                <span>Color principal CECAR</span>
+                <select name="primaryColor" required>
+                  <option value="#0c6c3e">Verde oscuro</option>
+                  <option value="#60ad45">Verde claro</option>
+                  <option value="#b9d539">Verde amarillento</option>
+                  <option value="#f5804c">Naranja oscuro</option>
+                  <option value="#f8a02b">Naranja claro</option>
+                  <option value="#fadb24">Amarillo</option>
+                  <option value="#666666">Gris</option>
+                </select>
               </label>
 
               <label class="full-width">
                 <span>Mensaje de bienvenida</span>
                 <textarea name="welcomeMessage" rows="3" required></textarea>
               </label>
+
+              <div class="full-width theme-preview-card" id="theme-preview-card">
+                <div class="theme-preview-header">
+                  <p class="eyebrow">Vista previa</p>
+                  <p class="theme-preview-note">Cambio visual sin descargar el JSON</p>
+                </div>
+                <div class="theme-preview-shell">
+                  <div class="theme-preview-sidebar">
+                    <h3 class="theme-preview-brand">Asistente CECAR</h3>
+                    <div class="theme-preview-course-card">
+                      <p class="theme-preview-label">Asistente del curso</p>
+                      <strong id="theme-preview-course">Nombre del curso</strong>
+                      <span id="theme-preview-teacher">Docente: Nombre del docente</span>
+                    </div>
+                  </div>
+                  <div class="theme-preview-chat">
+                    <div class="theme-preview-bubble assistant">
+                      <span>Asistente</span>
+                      <p>Este es un ejemplo de respuesta del asistente con el color seleccionado.</p>
+                    </div>
+                    <div class="theme-preview-bubble student">
+                      <span>Estudiante</span>
+                      <p>¿Cómo se evalúa el curso?</p>
+                    </div>
+                    <div class="theme-preview-action">Enviar</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -97,10 +128,10 @@
                 </select>
               </label>
 
-              <label>
+              <div class="model-display-card">
                 <span>Modelo</span>
-                <input name="model" required>
-              </label>
+                <strong id="provider-model-name">Cargando modelo...</strong>
+              </div>
 
               <div class="provider-help-card full-width" id="provider-help">
                 <p class="provider-help-title">Cargando informacion del proveedor...</p>
@@ -145,7 +176,7 @@
 
           <div class="chat-actions">
             <p class="helper-text">El formulario descarga un nuevo JSON. Luego reemplaza el archivo original antes de desplegar en Netlify.</p>
-            <button type="submit">Descargar course-data.json</button>
+            <button type="submit">Descargar configuración</button>
           </div>
         </form>
       </section>

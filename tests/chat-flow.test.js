@@ -6,6 +6,7 @@ const { findBestCourseMatch } = require("../netlify/functions/context-matcher");
 const { buildPrompt } = require("../netlify/functions/prompt-builder");
 const { createChatHandler } = require("../netlify/functions/chat");
 const { callProvider, getProviderSettings, ConfigurationError } = require("../netlify/functions/providers");
+const { createVerifyConfigAccessHandler } = require("../netlify/functions/verify-config-access");
 
 test("detecta preguntas del curso dentro del bloque unico de informacion", () => {
   const match = findBestCourseMatch("¿Cuando es la entrega del proyecto final?", sampleCourseData);
@@ -25,7 +26,7 @@ test("construye un prompt con reglas y contexto del curso", () => {
   const match = findBestCourseMatch("Explica la metodologia del curso", sampleCourseData);
   const prompt = buildPrompt(sampleCourseData, "Explica la metodologia del curso", match);
 
-  assert.match(prompt.systemPrompt, /Didactica Universitaria con IA/);
+  assert.match(prompt.systemPrompt, /Didáctica Universitaria con IA/);
   assert.match(prompt.systemPrompt, /Bloque oficial de informacion del curso/);
   assert.match(prompt.userPrompt, /metodologia/);
 });
@@ -210,4 +211,36 @@ test("Kimi usa Chat Completions compatible con OpenAI", async () => {
   assert.equal(Object.hasOwn(requestBody, "temperature"), false);
   assert.equal(requestBody.messages[0].role, "system");
   assert.equal(requestBody.messages[1].role, "user");
+});
+
+test("valida acceso a configuracion con variable de entorno", async () => {
+  const handler = createVerifyConfigAccessHandler({
+    env: { CONFIG_ACCESS_CODE: "clave-segura" }
+  });
+
+  const response = await handler({
+    httpMethod: "POST",
+    body: JSON.stringify({ code: "clave-segura" })
+  });
+
+  const payload = JSON.parse(response.body);
+
+  assert.equal(response.statusCode, 200);
+  assert.equal(payload.ok, true);
+});
+
+test("rechaza acceso a configuracion con codigo incorrecto", async () => {
+  const handler = createVerifyConfigAccessHandler({
+    env: { CONFIG_ACCESS_CODE: "clave-segura" }
+  });
+
+  const response = await handler({
+    httpMethod: "POST",
+    body: JSON.stringify({ code: "otra-clave" })
+  });
+
+  const payload = JSON.parse(response.body);
+
+  assert.equal(response.statusCode, 401);
+  assert.match(payload.error, /Codigo incorrecto/);
 });

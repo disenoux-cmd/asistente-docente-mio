@@ -1,8 +1,6 @@
 const courseNameNode = document.querySelector("#course-name");
 const teacherNameNode = document.querySelector("#teacher-name");
-const welcomeMessageNode = document.querySelector("#welcome-message");
 const chipRowNode = document.querySelector("#suggestion-chips");
-const providerBadgeNode = document.querySelector("#provider-badge");
 const chatLogNode = document.querySelector("#chat-log");
 const formNode = document.querySelector("#chat-form");
 const messageNode = document.querySelector("#message");
@@ -23,12 +21,42 @@ async function loadCourseData() {
 }
 
 function applyTheme(theme) {
+  const primaryColor = theme.primaryColor;
+  const contrastColor = getContrastColor(primaryColor);
+  const rgb = hexToRgb(primaryColor);
+
   document.documentElement.style.setProperty("--primary-color", theme.primaryColor);
-  document.documentElement.style.setProperty("--accent-color", theme.accentColor);
+  document.documentElement.style.setProperty("--accent-color", primaryColor);
+  document.documentElement.style.setProperty("--student-text", contrastColor);
+  document.documentElement.style.setProperty("--student-bubble", primaryColor);
+  document.documentElement.style.setProperty("--assistant-bubble", `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.08)`);
+  document.documentElement.style.setProperty("--badge-background", `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`);
+  document.documentElement.style.setProperty("--badge-border", `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.18)`);
+  document.documentElement.style.setProperty("--border-color", `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.12)`);
+  document.documentElement.style.setProperty("--shadow-color", `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.16)`);
 
   if (theme.surfaceColor) {
     document.documentElement.style.setProperty("--surface-color", theme.surfaceColor);
   }
+}
+
+function hexToRgb(hex) {
+  const normalized = String(hex || "#0c6c3e").replace("#", "");
+  const safeHex = normalized.length === 3
+    ? normalized.split("").map((char) => char + char).join("")
+    : normalized;
+
+  return {
+    r: Number.parseInt(safeHex.slice(0, 2), 16),
+    g: Number.parseInt(safeHex.slice(2, 4), 16),
+    b: Number.parseInt(safeHex.slice(4, 6), 16)
+  };
+}
+
+function getContrastColor(hex) {
+  const { r, g, b } = hexToRgb(hex);
+  const luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
+  return luminance > 150 ? "#163225" : "#ffffff";
 }
 
 function createChip(text) {
@@ -48,8 +76,6 @@ function renderCourseData(data) {
   courseData = data;
   courseNameNode.textContent = data.courseName;
   teacherNameNode.textContent = `Docente: ${data.teacherName}`;
-  welcomeMessageNode.textContent = data.assistant.welcomeMessage;
-  providerBadgeNode.textContent = `Proveedor: ${formatProviderLabel(data.llm.provider, data.llm.model)}`;
   applyTheme(data.theme);
 
   chipRowNode.innerHTML = "";
@@ -58,16 +84,6 @@ function renderCourseData(data) {
   }
 
   appendMessage("assistant", data.assistant.welcomeMessage);
-}
-
-function formatProviderLabel(provider, model) {
-  const labels = {
-    gemini: "Gemini",
-    kimi: "Kimi",
-    openai: "OpenAI"
-  };
-
-  return `${labels[provider] || provider} · ${model}`;
 }
 
 function appendMessage(role, text) {
@@ -81,7 +97,13 @@ function appendMessage(role, text) {
   textNode.innerHTML = formatMessageText(text);
 
   chatLogNode.append(article);
-  chatLogNode.scrollTop = chatLogNode.scrollHeight;
+  scrollChatToBottom();
+}
+
+function scrollChatToBottom() {
+  requestAnimationFrame(() => {
+    chatLogNode.scrollTop = chatLogNode.scrollHeight;
+  });
 }
 
 function escapeHtml(value) {
@@ -117,7 +139,7 @@ function showTypingIndicator() {
 
   typingIndicatorNode = article;
   chatLogNode.append(article);
-  chatLogNode.scrollTop = chatLogNode.scrollHeight;
+  scrollChatToBottom();
 }
 
 function hideTypingIndicator() {

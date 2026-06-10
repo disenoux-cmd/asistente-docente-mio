@@ -1,4 +1,3 @@
-const ACCESS_CODE = "docente2026";
 const accessPanel = document.querySelector("#access-panel");
 const accessCodeInput = document.querySelector("#access-code");
 const unlockButton = document.querySelector("#unlock-button");
@@ -8,6 +7,10 @@ const previewNode = document.querySelector("#json-preview");
 const providerGrid = document.querySelector("#provider-grid");
 const providerHelp = document.querySelector("#provider-help");
 const providerEnvKeyNode = document.querySelector("#provider-env-key");
+const providerModelNameNode = document.querySelector("#provider-model-name");
+const themePreviewCard = document.querySelector("#theme-preview-card");
+const themePreviewCourse = document.querySelector("#theme-preview-course");
+const themePreviewTeacher = document.querySelector("#theme-preview-teacher");
 
 const PROVIDER_PRESETS = {
   gemini: {
@@ -74,14 +77,13 @@ function fillForm(data) {
   configForm.elements.courseName.value = data.courseName;
   configForm.elements.teacherName.value = data.teacherName;
   configForm.elements.primaryColor.value = data.theme.primaryColor;
-  configForm.elements.accentColor.value = data.theme.accentColor;
   configForm.elements.welcomeMessage.value = data.assistant.welcomeMessage;
   configForm.elements.systemPrompt.value = data.assistant.systemPrompt;
   configForm.elements.outOfScopeMessage.value = data.assistant.outOfScopeMessage;
   configForm.elements.provider.value = data.llm.provider;
-  configForm.elements.model.value = data.llm.model;
   configForm.elements.knowledgeBase.value = buildKnowledgeBase(data);
   updateProviderUI(data.llm.provider, false);
+  updateThemePreview();
 }
 
 function splitLines(value) {
@@ -112,7 +114,7 @@ function buildSuggestionChipsFromKnowledgeBase(knowledgeBase) {
   const normalized = knowledgeBase.toLowerCase();
 
   if (normalized.includes("metodolog")) {
-    hints.push("¿Cual es la metodologia del curso?");
+    hints.push("¿Cuál es la metodología del curso?");
   }
 
   if (normalized.includes("foro")) {
@@ -120,29 +122,63 @@ function buildSuggestionChipsFromKnowledgeBase(knowledgeBase) {
   }
 
   if (normalized.includes("lectura")) {
-    hints.push("¿Que lecturas recomendadas hay?");
+    hints.push("¿Qué lecturas recomendadas hay?");
   }
 
   if (normalized.includes("unidad")) {
-    hints.push("¿Cuantas unidades tiene el curso?");
+    hints.push("¿Cuántas unidades tiene el curso?");
   }
 
   if (normalized.includes("evalua") || normalized.includes("nota")) {
-    hints.push("¿Como se evalua el curso?");
+    hints.push("¿Cómo se evalúa el curso?");
   }
 
   return hints.slice(0, 4);
 }
 
+function hexToRgb(hex) {
+  const normalized = String(hex || "#0c6c3e").replace("#", "");
+  const safeHex = normalized.length === 3
+    ? normalized.split("").map((char) => char + char).join("")
+    : normalized;
+
+  return {
+    r: Number.parseInt(safeHex.slice(0, 2), 16),
+    g: Number.parseInt(safeHex.slice(2, 4), 16),
+    b: Number.parseInt(safeHex.slice(4, 6), 16)
+  };
+}
+
+function getContrastColor(hex) {
+  const { r, g, b } = hexToRgb(hex);
+  const luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
+  return luminance > 150 ? "#163225" : "#ffffff";
+}
+
+function updateThemePreview() {
+  if (!themePreviewCard) {
+    return;
+  }
+
+  const primaryColor = configForm.elements.primaryColor.value;
+  const contrastColor = getContrastColor(primaryColor);
+
+  themePreviewCard.style.setProperty("--preview-primary", primaryColor);
+  themePreviewCard.style.setProperty("--preview-contrast", contrastColor);
+  themePreviewCourse.textContent = configForm.elements.courseName.value.trim() || "Nombre del curso";
+  themePreviewTeacher.textContent = `Docente: ${configForm.elements.teacherName.value.trim() || "Nombre del docente"}`;
+}
+
 function buildPayload(form) {
   const knowledgeBase = form.elements.knowledgeBase.value.trim();
+  const primaryColor = form.elements.primaryColor.value;
 
   return {
     courseName: form.elements.courseName.value.trim(),
     teacherName: form.elements.teacherName.value.trim(),
     theme: {
-      primaryColor: form.elements.primaryColor.value,
-      accentColor: form.elements.accentColor.value,
+      primaryColor,
+      accentColor: primaryColor,
       surfaceColor: "#f8fafc"
     },
     assistant: {
@@ -153,7 +189,7 @@ function buildPayload(form) {
     },
     llm: {
       provider: form.elements.provider.value,
-      model: form.elements.model.value.trim()
+      model: PROVIDER_PRESETS[form.elements.provider.value]?.model || PROVIDER_PRESETS.gemini.model
     },
     courseContext: {
       knowledgeBase
@@ -189,17 +225,32 @@ function unlockForm() {
   configForm.classList.remove("hidden");
 }
 
+async function verifyAccessCode(code) {
+  const response = await fetch("/.netlify/functions/verify-config-access", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ code })
+  });
+
+  const payload = await response.json().catch(() => ({ error: "No fue posible validar el acceso." }));
+
+  if (!response.ok) {
+    throw new Error(payload.error || "No fue posible validar el acceso.");
+  }
+
+  return payload;
+}
+
 function updateProviderUI(provider, shouldForceModel = true) {
   const normalizedProvider = PROVIDER_PRESETS[provider] ? provider : "gemini";
   const preset = PROVIDER_PRESETS[normalizedProvider];
   const providerInput = configForm.elements.provider;
-  const modelInput = configForm.elements.model;
 
   providerInput.value = normalizedProvider;
 
-  if (shouldForceModel || !modelInput.value.trim() || Object.values(PROVIDER_PRESETS).some((item) => item.model === modelInput.value.trim())) {
-    modelInput.value = preset.model;
-  }
+  providerModelNameNode.textContent = preset.model;
 
   providerHelp.querySelector(".provider-help-title").textContent = `${preset.label}: ${preset.model}`;
   providerHelp.querySelector(".provider-help-copy").textContent = preset.note;
@@ -220,19 +271,37 @@ providerGrid.addEventListener("click", (event) => {
   updateProviderUI(button.dataset.providerOption);
 });
 
+configForm.elements.primaryColor.addEventListener("change", updateThemePreview);
+configForm.elements.courseName.addEventListener("input", updateThemePreview);
+configForm.elements.teacherName.addEventListener("input", updateThemePreview);
+
 configForm.elements.provider.addEventListener("change", (event) => {
   updateProviderUI(event.target.value);
 });
 
-unlockButton.addEventListener("click", () => {
-  if (accessCodeInput.value !== ACCESS_CODE) {
-    accessCodeInput.setCustomValidity("Codigo incorrecto");
+unlockButton.addEventListener("click", async () => {
+  const code = accessCodeInput.value.trim();
+
+  if (!code) {
+    accessCodeInput.setCustomValidity("Ingresa el codigo de acceso");
     accessCodeInput.reportValidity();
     return;
   }
 
   accessCodeInput.setCustomValidity("");
-  unlockForm();
+  unlockButton.disabled = true;
+  unlockButton.textContent = "Validando...";
+
+  try {
+    await verifyAccessCode(code);
+    unlockForm();
+  } catch (error) {
+    accessCodeInput.setCustomValidity(error.message);
+    accessCodeInput.reportValidity();
+  } finally {
+    unlockButton.disabled = false;
+    unlockButton.textContent = "Ingresar";
+  }
 });
 
 configForm.addEventListener("submit", (event) => {
