@@ -6,7 +6,7 @@ Plantilla base para crear y desplegar un asistente virtual de curso en Netlify. 
 
 Si tienes cuenta en Netlify y en GitHub, este botón crea el sitio, lo configura y lo deja listo para que solo tengas que agregar tus claves:
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/TU-USUARIO/asistente-docente)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/osber00/asistente-docente)
 
 Despues del deploy:
 1. Abre el sitio creado y ve a **Site configuration > Environment variables**.
